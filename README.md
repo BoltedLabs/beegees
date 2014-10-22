@@ -1,8 +1,8 @@
-beegees
+##beegees
 =======
 ![Beegees](http://sebastiandieser.com/dev/beegees/logo-beegees.jpg)
 
-####"For those that are bored of their backgrounds."
+####"For those that need fresh beegees."
 
 **Why Beeges?**
 
