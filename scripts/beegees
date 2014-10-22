@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+"""
+PyBeeGees: quickly change your background.
+--------------------
+Features:
+- Change background image when script is invoked
+- Set location and option to download backgrounds of pybeegees site
+
+"""
+import subprocess, os, random
+
+beegees_dir = '/Users/sebastiandieser/Documents/GitHub/misc/pybeegees/images'
+
+def get_image(location=None):
+    print "Background images location:\n %s" % location
+    if location is not None:
+        image = random.choice(os.listdir(location))
+        path = "%s/%s" % (location, image)
+        print "Background changed to:\n", path
+        return path
+    else:
+        print 'No location directory path set.'
+
+    return None
+
+Script = """/usr/bin/osascript<<END
+tell application "System Events"
+set picture of every desktop to "%s"
+end tell
+END"""
+
+filename = get_image(beegees_dir)
+
+subprocess.Popen(Script%filename, shell=True)
