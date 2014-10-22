@@ -1,7 +1,11 @@
 beegees
 =======
+![Beegees](http://sebastiandieser.com/dev/beegees/logo-beegees.jpg)
 
 ####"For those that are bored of their backgrounds."
+
+**Why Beeges?**
+backgrounds -> bg's -> bgs -> [beegees](https://www.youtube.com/watch?v=I_izvAbhExY "Beegees")
 
 **Details:**
 - Run `python download.py`
