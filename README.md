@@ -8,13 +8,13 @@
 
 backgrounds -> bg's -> bgs -> [beegees](https://www.youtube.com/watch?v=I_izvAbhExY "Beegees")
 
-**Details:**
+**Installation:**
 
-- Run `python download.py`
-- Change path in scripts/beeges.py to yours. `beegees_dir = '.../pybeegees/images'` (Will set absolute path later but give the user option to change location of images)
-- Run `python setup.py`
-- Should set sym link. If it doesn't then you need to create symlink *beegees* to /scripts/beeges.py
-- Run `beegees` in terminal and it will change your bg in current desktop.
+1. Download the code: `git clone https://github.com/BoltedLabs/beegees.git`
+1. Install: `pip install -e beegees`
+1. Set the image path: `beegees set_image_path ~/your/image/path`
+1. Download some cool background images: `beegees download_beegees`
+1. Change your background: `beegees`
 
 **Features:**
 
