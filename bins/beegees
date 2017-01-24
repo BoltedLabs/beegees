@@ -12,7 +12,7 @@ import os
 import random
 import sys
 
-beegees_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'images'
+beegees_dir = '/Users/bioto/Projects/beegees/images'
 if not os.path.exists(beegees_dir):
     os.makedirs(beegees_dir)
 
@@ -34,7 +34,7 @@ def get_image(location=None):
 
 filename = get_image(beegees_dir)
 
-if sys.platform is "darwin":
+if sys.platform == "darwin":
     script = """/usr/bin/osascript<<END
     tell application "System Events"
         set desktopCount to count of desktops
@@ -46,11 +46,11 @@ if sys.platform is "darwin":
     end tell
     END"""
     subprocess.Popen(script%filename, shell=True)
-elif sys.platform is "linux":
+elif sys.platform == "linux":
     import commands
     command = "gconftool-2 --set /desktop/gnome/background/picture_filename --type string '%s'" % filename
     status, output = commands.getstatusoutput(command)  # status=0 if success
-elif sys.platform is "cygwin" or sys.platform is "win32":
+elif sys.platform == "cygwin" or sys.platform == "win32":
     import ctypes
     SPI_SETDESKWALLPAPER = 20
     ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
