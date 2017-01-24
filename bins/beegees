@@ -17,6 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 config_path = path = os.path.join(os.path.expanduser('~'), '.beegees')
+download_progress = 0
 
 def get_config():
     """
@@ -116,6 +117,57 @@ def randomize():
         import ctypes
         SPI_SETDESKWALLPAPER = 20
         ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
+
+@cli.command()
+def download_beegees():
+    from HTMLParser import HTMLParser
+    import urllib, os, sys, time
+    global download_progress
+
+    images = []
+    directory = get_config()[1]
+    download_progress = 0
+    path = 'http://sebastiandieser.com/dev/beegees/backgrounds/'
+
+    class AnchorParser(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            if tag == 'a':
+                for key, value in attrs:
+                    if key == 'href':
+                        file_type = value.split('.')
+                        ext = os.path.splitext(value)[1]
+                        if ext == '.jpg' or ext == '.png':
+                            images.append(value)
+
+    parser = AnchorParser()
+    data = urllib.urlopen(path).read()
+    parser.feed(data)
+
+    # Create directory if it doesn't exist
+    if not os.path.exists(directory):
+        print 'Directory "%s" does not exist.' % directory
+        os.makedirs(directory)
+        print 'Created directory: %s' % directory
+
+    # Progress hook
+    def report_hook(count, blockSize, totalSize):
+        global download_progress
+        download_progress += blockSize
+
+        percent = float(download_progress)/totalSize
+        percent = round(percent*100, 2)
+        result = '%d%%' % percent
+
+        sys.stdout.write(result)
+        sys.stdout.flush()
+        sys.stdout.write('\b\b\b\b')
+
+    # Download images
+    for image in images:
+        print 'Downloading: %s%s' % (path, image)
+        urllib.urlretrieve('%s%s' % (path, image), '%s/%s' % (directory, image), reporthook=report_hook)
+        download_progress = 0
+        print 'Done.\n'
 
 @cli.command()
 @click.argument('path', default=None, type=click.Path(exists=True))
