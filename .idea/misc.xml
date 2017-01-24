@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="EmacsSettings">
+    <option name="emacsPath" value="/usr/bin/emacs" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 2.7.10 (/usr/bin/python)" project-jdk-type="Python SDK" />
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings sdk-home="$USER_HOME$/.virtualenvs/django_apg/bin/python">
+        <envs>
+          <env key="DATABASE_URL" value="postgresql://bioto@localhost/apg" />
+          <env key="ELASTICSEARCH_URL" value="http://localhost:9200" />
+        </envs>
+        <option name="mySdkHome" value="$USER_HOME$/.virtualenvs/django_apg/bin/python" />
+        <option name="myEnvs">
+          <map>
+            <entry key="DATABASE_URL" value="postgresql://bioto@localhost/apg" />
+            <entry key="ELASTICSEARCH_URL" value="http://localhost:9200" />
+          </map>
+        </option>
+      </console-settings>
+    </option>
+  </component>
+</project>

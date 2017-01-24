@@ -8,7 +8,6 @@ Features:
 
 """
 import subprocess
-import random
 import os
 import random
 import sys
@@ -22,10 +21,24 @@ download_progress = 0
 
 
 def get_config():
-    """
-        Grabs configuration file status.
+    """ Grabs configuration file status.
         If exists returns first line
-    """
+
+    Returns:
+        After trying and succeeding to open the file:
+            (
+                True: Successful,
+                str: path to images directory
+            )
+        After trying and failing to open the file:
+            (
+                False: Failure,
+                str: Error message
+            )
+    Raises:
+       IOError:
+           Something went wrong with handling the file
+   """
     try:
         with open(config_path, 'r') as f:
             content = f.readline()
@@ -37,8 +50,22 @@ def get_config():
 
 
 def write_config(path):
-    """
-        Wipes and creates config file with new path
+    """ Wipes and creates config file with new path
+
+    Returns:
+        After trying and succeeding to open the file:
+            (
+                True: Successful,
+                str: path to images directory
+            )
+        After trying and failing to open the file:
+            (
+                False: Failure,
+                str: Error message
+            )
+    Raises:
+        IOError:
+            Something went wrong with handling the file
     """
     if '~' in path:
         path = os.path.expanduser('~') + path.split[1]
@@ -54,13 +81,26 @@ def write_config(path):
             f.write(path)
 
         return True, None
-    except Exception as e:
+    except IOError as e:
         return False, e
 
 
 def get_image_randomly(location=None):
-    """
-        Chooses new image for background randomly
+    """ Chooses new image for background randomly
+
+    Attrs:
+        location: Path to images folder
+
+    Returns:
+        After successfully getting a new image:
+            str: Path to image
+        After not finding the image location:
+            None: No directory found
+        After not finding any images:
+            None: No images found
+    Raises:
+        IOError:
+            Something went wrong with handling the file
     """
     logging.info("Background images location:\n {}".format(location))
     if location is not None:
@@ -72,6 +112,7 @@ def get_image_randomly(location=None):
             return path
         else:
             logging.info('The images folder is empty.')
+            return None
     else:
         logging.info('No location directory path set.')
 
@@ -81,8 +122,10 @@ def get_image_randomly(location=None):
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
-    """
-        Randomizes background
+    """ Randomizes background
+
+    Attrs:
+        ctx: Context for click
     """
     if ctx.invoked_subcommand is None:
         ctx.invoke(randomize)
@@ -92,9 +135,7 @@ def cli(ctx):
 
 @cli.command()
 def randomize():
-    """
-        Handles actually setting the background image
-    """
+    """ Handles actually setting the background image """
     path = get_config()
 
     if not path[0]:
@@ -133,9 +174,7 @@ def randomize():
 
 @cli.command()
 def download_beegees():
-    """
-        Downloads supplied beegees for rotation
-    """
+    """ Downloads supplied beegees for rotation """
     from HTMLParser import HTMLParser
     import urllib
     import time
@@ -192,9 +231,7 @@ def download_beegees():
 @cli.command()
 @click.argument('path', default=None, type=click.Path(exists=True))
 def set_image_path(path):
-    """
-        Sets config file to specified path
-    """
+    """ Sets config file to specified path """
     write = write_config(path)
     if write[0]:
         logging.info('Image path set to: {}'.format(path))
