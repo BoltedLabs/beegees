@@ -11,46 +11,124 @@ import subprocess, os, random
 import os
 import random
 import sys
+import click
+import logging
 
-beegees_dir = '/Users/bioto/Projects/beegees/images'
-if not os.path.exists(beegees_dir):
-    os.makedirs(beegees_dir)
+logging.basicConfig(level=logging.INFO)
 
-def get_image(location=None):
-    print "Background images location:\n %s" % location
+config_path = path = os.path.join(os.path.expanduser('~'), '.beegees')
+
+def get_config():
+    """
+        Grabs configuration file status.
+        If exists returns first line
+    """
+    try:
+        with open(config_path, 'r') as f:
+            content = f.readline()
+
+            if len(content) > 0:
+                return True, content
+    except IOError as e:
+        return False, e.message
+
+def write_config(path):
+    """
+        Wipes and creates config file with new path
+    """
+    if '~' in path:
+        path = os.path.expanduser('~') + path.split[1]
+
+    if '/' == path[-1:]:
+        path = path[0:-1]
+
+    if os.path.exists(config_path):
+        os.remove(config_path)
+
+    try:
+        with open(config_path, 'w+') as f:
+            f.write(path)
+
+        return True, None
+    except Exception as e:
+        return False, e
+
+def get_image_randomly(location=None):
+    """
+        Chooses new image for background randomly
+    """
+    logging.info("Background images location:\n {}".format(location))
     if location is not None:
         images = os.listdir(location)
         if images:
             image = random.choice(images)
             path = "%s/%s" % (location, image)
-            print "Background changed to:\n", path
+            logging.info("Background changed to:\n {}".format(path))
             return path
         else:
-            print 'The images folder is empty.'
+            logging.info('The images folder is empty.')
     else:
-        print 'No location directory path set.'
+        logging.info('No location directory path set.')
 
     return None
 
-filename = get_image(beegees_dir)
+@click.group(invoke_without_command=True)
+@click.pass_context
+def cli(ctx):
+    """
+        Randomizes background
+    """
+    if ctx.invoked_subcommand is None:
+        ctx.invoke(randomize)
+    else:
+        pass
 
-if sys.platform == "darwin":
-    script = """/usr/bin/osascript<<END
-    tell application "System Events"
-        set desktopCount to count of desktops
-        repeat with desktopNumber from 1 to desktopCount
-            tell desktop desktopNumber
-                set picture to "%s"
-            end tell
-        end repeat
-    end tell
-    END"""
-    subprocess.Popen(script%filename, shell=True)
-elif sys.platform == "linux":
-    import commands
-    command = "gconftool-2 --set /desktop/gnome/background/picture_filename --type string '%s'" % filename
-    status, output = commands.getstatusoutput(command)  # status=0 if success
-elif sys.platform == "cygwin" or sys.platform == "win32":
-    import ctypes
-    SPI_SETDESKWALLPAPER = 20
-    ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
+@cli.command()
+def randomize():
+    """
+        Handles actually setting the background image
+    """
+    path = get_config()
+
+    if not path[0]:
+        logging.error('Image path not set. Use command set_image_path to set the path to your images')
+        exit()
+    filename = get_image_randomly(path[1])
+
+    if sys.platform == "darwin":
+        # TODO: Fix osascript error
+        script = """/usr/bin/osascript<<END
+        tell application "System Events"
+            set desktopCount to count of desktops
+            repeat with desktopNumber from 1 to desktopCount
+                tell desktop desktopNumber
+                    set picture to "%s"
+                end tell
+            end repeat
+        end tell
+        END"""
+        subprocess.call(script%filename, shell=True)
+    elif sys.platform == "linux":
+        import commands
+        command = "gconftool-2 --set /desktop/gnome/background/picture_filename --type string '%s'" % filename
+        status, output = commands.getstatusoutput(command)  # status=0 if success
+    elif sys.platform == "cygwin" or sys.platform == "win32":
+        import ctypes
+        SPI_SETDESKWALLPAPER = 20
+        ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
+
+@cli.command()
+@click.argument('path', default=None, type=click.Path(exists=True))
+def set_image_path(path):
+    """
+        Sets config file to specified path
+    """
+    write = write_config(path)
+    if write[0]:
+        logging.info('Image path set to: {}'.format(path))
+    else:
+        logging.error('Something went wrong: {}', write[1])
+
+
+if __name__ == '__main__':
+    cli()
