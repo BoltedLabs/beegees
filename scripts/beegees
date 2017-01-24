@@ -9,26 +9,45 @@ Features:
 """
 import subprocess, os, random
 
-beegees_dir = '/Users/sebastiandieser/Documents/GitHub/misc/pybeegees/images'
+beegees_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + os.sep + 'images'
+if not os.path.exists(beegees_dir):
+    os.makedirs(beegees_dir)
 
 def get_image(location=None):
     print "Background images location:\n %s" % location
     if location is not None:
-        image = random.choice(os.listdir(location))
-        path = "%s/%s" % (location, image)
-        print "Background changed to:\n", path
-        return path
+        images = os.listdir(location)
+        if images:
+            image = random.choice(images)
+            path = "%s/%s" % (location, image)
+            print "Background changed to:\n", path
+            return path
+        else:
+            print 'The images folder is empty.'
     else:
         print 'No location directory path set.'
 
     return None
 
-Script = """/usr/bin/osascript<<END
-tell application "System Events"
-set picture of every desktop to "%s"
-end tell
-END"""
-
 filename = get_image(beegees_dir)
 
-subprocess.Popen(Script%filename, shell=True)
+if MAC:
+    script = """/usr/bin/osascript<<END
+    tell application "System Events"
+        set desktopCount to count of desktops
+        repeat with desktopNumber from 1 to desktopCount
+            tell desktop desktopNumber
+                set picture to "%s"
+            end tell
+        end repeat
+    end tell
+    END"""
+    subprocess.Popen(script%filename, shell=True)
+elif GNOME:
+    import commands
+    command = "gconftool-2 --set /desktop/gnome/background/picture_filename --type string '%s'" % filename
+    status, output = commands.getstatusoutput(command)  # status=0 if success
+elif WINDOWs:
+    import ctypes
+    SPI_SETDESKWALLPAPER = 20
+    ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
