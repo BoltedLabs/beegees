@@ -7,7 +7,8 @@ Features:
 - Set location and option to download backgrounds of pybeegees site
 
 """
-import subprocess, os, random
+import subprocess
+import random
 import os
 import random
 import sys
@@ -18,6 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 config_path = path = os.path.join(os.path.expanduser('~'), '.beegees')
 download_progress = 0
+
 
 def get_config():
     """
@@ -32,6 +34,7 @@ def get_config():
                 return True, content
     except IOError as e:
         return False, e.message
+
 
 def write_config(path):
     """
@@ -54,6 +57,7 @@ def write_config(path):
     except Exception as e:
         return False, e
 
+
 def get_image_randomly(location=None):
     """
         Chooses new image for background randomly
@@ -73,6 +77,7 @@ def get_image_randomly(location=None):
 
     return None
 
+
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
@@ -84,6 +89,7 @@ def cli(ctx):
     else:
         pass
 
+
 @cli.command()
 def randomize():
     """
@@ -92,7 +98,8 @@ def randomize():
     path = get_config()
 
     if not path[0]:
-        logging.error('Image path not set. Use command set_image_path to set the path to your images')
+        logging.error('Image path not set. Use command'
+                      'set_image_path to set the path to your images')
         exit()
     filename = get_image_randomly(path[1])
 
@@ -108,15 +115,21 @@ def randomize():
             end repeat
         end tell
         END"""
-        subprocess.call(script%filename, shell=True)
+        subprocess.call(script % filename, shell=True)
     elif sys.platform == "linux":
         import commands
-        command = "gconftool-2 --set /desktop/gnome/background/picture_filename --type string '%s'" % filename
-        status, output = commands.getstatusoutput(command)  # status=0 if success
+        command = "gconftool-2 --set " \
+                  "/desktop/gnome/background/picture_filename" \
+                  "--type string '%s'" % filename
+
+        # status=0 if success
+        status, output = commands.getstatusoutput(command)
     elif sys.platform == "cygwin" or sys.platform == "win32":
         import ctypes
         SPI_SETDESKWALLPAPER = 20
-        ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filename, 0)
+        ctypes.windll.user32.SystemParametersInfoA(
+                                        SPI_SETDESKWALLPAPER, 0, filename, 0)
+
 
 @cli.command()
 def download_beegees():
@@ -124,7 +137,8 @@ def download_beegees():
         Downloads supplied beegees for rotation
     """
     from HTMLParser import HTMLParser
-    import urllib, os, sys, time
+    import urllib
+    import time
     global download_progress
 
     images = []
@@ -168,9 +182,12 @@ def download_beegees():
     # Download images
     for image in images:
         print 'Downloading: %s%s' % (path, image)
-        urllib.urlretrieve('%s%s' % (path, image), '%s/%s' % (directory, image), reporthook=report_hook)
+        urllib.urlretrieve('%s%s' % (path, image),
+                           '%s/%s' % (directory, image),
+                           reporthook=report_hook)
         download_progress = 0
         print 'Done.\n'
+
 
 @cli.command()
 @click.argument('path', default=None, type=click.Path(exists=True))
