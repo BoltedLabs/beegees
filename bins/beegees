@@ -120,6 +120,9 @@ def randomize():
 
 @cli.command()
 def download_beegees():
+    """
+        Downloads supplied beegees for rotation
+    """
     from HTMLParser import HTMLParser
     import urllib, os, sys, time
     global download_progress
