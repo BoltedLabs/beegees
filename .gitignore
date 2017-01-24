@@ -38,3 +38,5 @@ target/
 images/
 
 *.DS_Store
+
+.idea
