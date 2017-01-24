@@ -1,7 +1,9 @@
 from setuptools import setup
 
 setup(
-    scripts = [
-        'scripts/beegees'
-    ]
+    name='beegees',
+    version='0.1',
+    description='For those that need fresh beegees.',
+    url='https://github.com/BoltedLabs/beegees',
+    scripts=['bins/beegees']
 )
